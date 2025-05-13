@@ -20,3 +20,12 @@ pynput
 colorlog
 colorama
 peft
+
+# for pi0
+websockets
+msgpack
+
+# for openvla
+# datasets
+timm==0.9.16
+# flash_attn # To download the model weights
