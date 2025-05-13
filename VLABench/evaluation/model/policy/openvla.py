@@ -29,7 +29,7 @@ class OpenVLA(Policy):
     )
     def __init__(self, 
                  model_ckpt,
-                 lora_ckpt, 
+                 lora_ckpt=None,
                  attn_implementation=None,
                  norm_config_file=None,
                  device="cuda",
@@ -52,9 +52,12 @@ class OpenVLA(Policy):
             torch_dtype=torch.bfloat16,
             low_cpu_mem_usage=True,
             trust_remote_code=True,
-        )
-        peft_config = PeftConfig.from_pretrained(lora_ckpt)
-        model = PeftModel.from_pretrained(model, lora_ckpt, config=peft_config).to(device)
+        ).to(device)
+        
+        if lora_ckpt is not None:
+            peft_config = PeftConfig.from_pretrained(lora_ckpt)
+            model = PeftModel.from_pretrained(model, lora_ckpt, config=peft_config).to(device)
+            
         self.device = device
         super().__init__(model)
         
