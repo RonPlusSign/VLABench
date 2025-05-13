@@ -16,7 +16,7 @@ class Evaluator:
                  tolerance=1e-2,
                  metrics=["success_rate"],
                  save_dir=None,
-                 visulization=False,
+                 visualization=False,
                  eval_unseen=False,
                  **kwargs
                  ):
@@ -29,7 +29,7 @@ class Evaluator:
             max_substeps: maximum number of substeps for env.step
             metrics: list of metrics to evaluate
             save_dir: directory to save the evaluation results
-            visulization: whether to visualize the evaluation progress as videos
+            visualization: whether to visualize the evaluation progress as videos
             eval_unseen: whether to evaluate the unseen object categories
         """
         if isinstance(episode_config, str):
@@ -54,7 +54,7 @@ class Evaluator:
         self.save_dir = save_dir
         if self.save_dir is not None:
             os.makedirs(self.save_dir, exist_ok=True)
-        self.visulization = visulization
+        self.visualization = visualization
         
     def evaluate(self, agent):
         """
@@ -80,6 +80,7 @@ class Evaluator:
             
             if self.save_dir is not None:
                 os.makedirs(os.path.join(self.save_dir, agent.name), exist_ok=True)
+                os.makedirs(os.path.join(self.save_dir, agent.name, task), exist_ok=True)
                 if os.path.exists(os.path.join(self.save_dir, agent.name, "metrics.json")):
                     with open(os.path.join(self.save_dir, agent.name, "metrics.json"), "r") as f:
                         previous_metrics = json.load(f)
@@ -122,7 +123,7 @@ class Evaluator:
             if last_action is None:
                 last_action = np.concatenate([ee_state[:3], quaternion_to_euler(ee_state[3:7])])
             observation["last_action"] = last_action
-            if self.save_dir is not None and self.visulization:
+            if self.save_dir is not None and self.visualization:
                 frames_to_save.append(observation["rgb"])
             if agent.control_mode == "ee":
                 pos, euler, gripper_state = agent.predict(observation, **kwargs)
@@ -153,7 +154,7 @@ class Evaluator:
         info["progress_score"] = env.get_task_progress()
         
         env.close()
-        if self.save_dir is not None and self.visulization:
+        if self.save_dir is not None and self.visualization:
             os.makedirs(os.path.join(self.save_dir, agent.name, task_name), exist_ok=True)
             self.save_video(frames_to_save, os.path.join(self.save_dir, agent.name, task_name, f"{episode_id}.mp4"))
         return info
@@ -186,5 +187,4 @@ class Evaluator:
         frames_to_save = [] 
         for frame in frames:
             frames_to_save.append(np.vstack([np.hstack(frame[:2]), np.hstack(frame[2:4])]))
-        mediapy.write_video(save_dir, 
-                            frames_to_save, fps=10) 
+        mediapy.write_video(save_dir, frames_to_save, fps=10, codec="libx264") 
