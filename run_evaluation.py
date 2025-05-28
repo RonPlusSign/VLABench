@@ -8,7 +8,11 @@ from VLABench.robots import *
 """
 Alternatively:
 
+for OpenVLA:
 python scripts/evaluate_policy.py --eval-track=track_1_in_distribution --n-episode=10 --policy=openvla --model_ckpt="~/VLABench/checkpoints/openvla-7b" --lora_ckpt="" --save-dir="~/VLABench/logs/visual_generalization" --visualization --metrics success_rate intention_score progress_score
+
+for Pi0:
+python scripts/evaluate_policy.py --eval-track=track_1_in_distribution --n-episode=10 --policy=openpi --host="127.0.1.1" --save-dir="~/VLABench/logs/visual_generalization" --port="8000" --visualization --metrics success_rate intention_score progress_score
 """
 
 # (Table 2a) Evaluation of visual generalization and knowledge transfer

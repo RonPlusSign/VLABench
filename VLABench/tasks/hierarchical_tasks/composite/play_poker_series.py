@@ -3,6 +3,7 @@ import numpy as np
 from VLABench.utils.register import register
 from VLABench.tasks.config_manager import BenchTaskConfigManager
 from VLABench.tasks.dm_task import *
+from VLABench.tasks.hierarchical_tasks.composite.base import CompositeTask
 from VLABench.configs.constant import name2class_xml
 from VLABench.tasks.components import CardHolder, Poker
 from VLABench.tasks.hierarchical_tasks.poker_utils import *
@@ -86,7 +87,7 @@ class TexasHoldemExploreConfigManager(TexasHoldemConfigManager):
         return self.config
 
 @register.add_task("texas_holdem")
-class PokerPlayTask(LM4ManipBaseTask):
+class PokerPlayTask(CompositeTask):
     def __init__(self, task_name, robot, **kwargs):
         self.pokers = list()
         super().__init__(task_name, robot, **kwargs)
@@ -152,7 +153,7 @@ class PokerPlayExploreTask(PokerPlayTask):
         super().__init__(task_name, robot, **kwargs)
     
     def init_conditions(self):
-        self.target_entities = dict()
+        self._target_entities = dict()
         rank, target_cards = get_largest_combination([(poker.name.split('_')[0], poker.name.split('_')[2]) for poker in self.pokers])
         self.max_cardtype = list(RANKING.keys())[-rank]
         assert len(target_cards) > 0
@@ -161,8 +162,8 @@ class PokerPlayExploreTask(PokerPlayTask):
             if target_name not in self.entities:
                 target_name += "_face_down"
             target_entity = self.entities[target_name]
-            self.target_entities[target_name] = target_entity
-        entities=list(self.target_entities.values())
+            self._target_entities[target_name] = target_entity
+        entities=list(self._target_entities.values())
         if None in entities:
             entities.remove(None)
         on_condition = ContainCondition(entities=entities, 
