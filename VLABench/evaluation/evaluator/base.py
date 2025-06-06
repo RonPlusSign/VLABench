@@ -102,6 +102,9 @@ class Evaluator:
                     json.dump(previous_metrics, f, indent=4)
                 with open(os.path.join(self.save_dir, agent.name, task, f"detail_info.json"), "w") as f:
                     json.dump(task_infos, f, indent=4)
+                path_1 = os.path.join(self.save_dir, agent.name, "metrics.json")
+                path_2 = os.path.join(self.save_dir, agent.name, task, "detail_info.json")
+                print(f"Updated {path_1} and {path_2}")
         return metrics
         
     def evaluate_single_episode(self, agent, task_name, episode_id, episode_config, seed=42, max_episode_length=200, **kwargs):
@@ -168,6 +171,8 @@ class Evaluator:
         if self.save_dir is not None and self.visualization:
             os.makedirs(os.path.join(self.save_dir, agent.name, task_name), exist_ok=True)
             self.save_video(frames_to_save, os.path.join(self.save_dir, agent.name, task_name, f"{episode_id}.mp4"))
+            video_path = os.path.join(self.save_dir, agent.name, task_name, f"{episode_id}.mp4")
+            print(f"Saved video to {video_path}")
         return info
         
     def compute_metric(self, infos):

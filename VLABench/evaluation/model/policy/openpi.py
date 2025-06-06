@@ -73,6 +73,7 @@ class OpenPiPolicy:
                 "prompt": observation["instruction"],
                 }
             action_chunk = self.infer(policy_input)["actions"]
+            print(f"Actions received: {action_chunk}")
             self.action_plan.extend(action_chunk[: self.replan_steps])
         self.timestep += 1
         raw_action = self.action_plan.popleft()

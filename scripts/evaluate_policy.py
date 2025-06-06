@@ -28,13 +28,16 @@ def get_args():
 def evaluate(args):
     episode_config = None
     if args.eval_track is not None:
-        args.save_dir = os.path.join(args.save_dir, args.eval_track)
+        # args.save_dir = os.path.join(args.save_dir, args.eval_track)
         with open(os.path.join(os.getenv("VLABENCH_ROOT"), "configs/evaluation/tracks", f"{args.eval_track}.json"), "r") as f:
             episode_config = json.load(f)
             tasks = list(episode_config.keys())
     if args.tasks is not None:
         tasks = args.tasks
     assert isinstance(tasks, list)
+    
+    print(f"Visualization: {args.visualization}, save_dir: {args.save_dir}")
+    print(f"Tasks to evaluate: {tasks}")
 
     evaluator = Evaluator(
         tasks=tasks,
@@ -47,6 +50,7 @@ def evaluate(args):
     )
     if args.policy.lower() == "openvla":
         policy = OpenVLA(
+	    device="cuda:0",
             model_ckpt=args.model_ckpt,
             lora_ckpt=(args.lora_ckpt if args.lora_ckpt != "" else None),
             norm_config_file=os.path.join(os.getenv("VLABENCH_ROOT"), "configs/model/openvla_config.json") # TODO: re-compuate the norm state by your own dataset
@@ -64,6 +68,8 @@ def evaluate(args):
     os.makedirs(os.path.join(args.save_dir, args.policy, args.eval_track), exist_ok=True)
     with open(os.path.join(args.save_dir, args.policy, args.eval_track, "evaluation_result.json"), "w") as f:
         json.dump(result, f)
+        path = os.path.join(args.save_dir, args.policy, args.eval_track)
+        print("Saved evaluation_result.json in {path}")
 
 if __name__ == "__main__":
     args = get_args()
